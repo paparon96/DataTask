@@ -1,0 +1,36 @@
+Development choices:
+- I use PostgreSQL as the database for the project, mainly due to its simplicity and since it was totally sufficient for this project given the straightforward, tabular format of the data
+- I run PostgreSQL through Docker to have less exposure to computing environment issues
+- I use Flask to implement the web application, since it is a simple and quick way to run web apps in Python
+
+Setup instructions:
+1. First start a PostgreSQL container with Docker
+	run: docker run -d --name postgresdb -p 5432:5432 postgres
+
+	Requirements for this step: Docker installed on the computer
+
+	(Also note: you may need to free up port 5432 beforehand!)
+
+2. Then initialize the PostgreSQL database
+	run: cat sql_db_creation.sql | docker run --net host -i postgres psql --host 0.0.0.0 --user postgres
+
+3. Then execute the script to transfer the data from the .csv file to the database
+	run: python3 data_transfer_to_DB.py
+
+	Requirements for this step:
+		- Python libraries: pandas,psycopg2, sqlalchemy 
+		- Other prerequisites: The data file ('task_data.csv') should be in the same directory as data_transfer_to_DB.py
+
+4. Then execute the script to load the data from the database, serve it in html format and log get requests into the same database
+	run: python3 web_app.py
+
+	Requirements for this step:
+		- Python libraries: pandas,psycopg2, sqlalchemy, flask 
+		- Other prerequisites: There should be a 'templates' folder in the same directory as web_app.py, with a file named 'simple.html' in it
+
+5. Check the web app
+	run: http://localhost:5000/ (from any HTTP-client)
+
+6. Check the database to see the logs
+	run: docker run --rm -it --net host postgres psql "$@" --host 0.0.0.0 --user postgres
+	
